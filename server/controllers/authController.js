@@ -5,7 +5,7 @@ const asyncHandler = require('express-async-handler')
 
 // POST /auth/signup
 const createNewUser = asyncHandler(async (req, res) => {
-    const { username, email, password } = req.body
+    const { username, email, password, isAdmin } = req.body
 
     if(!username || !email || !password) {
       return res.status(400).json({ message: 'All fields are required' })
@@ -21,11 +21,12 @@ const createNewUser = asyncHandler(async (req, res) => {
     const user = new User({
       name: username,
       email,
-      "password": hashedPwd
+      "password": hashedPwd,
+      isAdmin
     })
 
     await user.save()
-    const token = jwt.sign({ user: { id: user._id, isAdmin: user.isAdmin  } }, process.env.JWT_SECRET, { expiresIn: '1d' })
+    const token = jwt.sign({ user: { id: user._id, "isAdmin": user.isAdmin  } }, process.env.JWT_SECRET, { expiresIn: '1d' })
     res.status(201).json({ message: `New user ${username} created`, token, user: {
     id: user._id,
     name: user.name,
