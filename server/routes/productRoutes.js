@@ -4,9 +4,9 @@ const adminOnly = require('../middleware/adminOnly')
 const verifyJWT = require('../middleware/verifyJWT')
 const productsController = require('../controllers/productsController')
 
-router.get('/', adminOnly, verifyJWT, productsController.getAllProducts)
-router.post('/', adminOnly, verifyJWT, productsController.addProduct)
-router.patch('/:id', adminOnly, verifyJWT, productsController.updateProduct)
-router.delete('/:id', adminOnly, verifyJWT, productsController.removeProduct)
+router.get('/', verifyJWT, adminOnly, productsController.getAllProducts)
+router.post('/', verifyJWT, adminOnly, productsController.addProduct)
+router.patch('/:id', verifyJWT, adminOnly, productsController.updateProduct)
+router.delete('/:id', verifyJWT, adminOnly, productsController.removeProduct)
 
 module.exports = router
