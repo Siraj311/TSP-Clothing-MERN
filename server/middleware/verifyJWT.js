@@ -1,20 +1,22 @@
 const jwt = require('jsonwebtoken')
 
 const verifyJWT = async (req, res, next) => {
-  const token = req.header('auth-token')
-  if(!token) {
-    return res.status(401).json({ errors: 'Please authenticate using valid token' })
+  const authHeader = req.headers.authorization || req.headers.Authorization
+  if(!authHeader?.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Unauthorized' })
   }
 
-  try {
-    const data = jwt.verify(token, 'secret_ecom') 
-    req.user = data.user
-  } catch (error) {
-    console.log(error);
-    res.status(401).json({ message: 'Please authenticate user' })
-  }
-  
-  next()
+  const token = authHeader.split(' ')[1]
+
+  jwt.verify(
+    token,
+    process.env.JWT_SECRET,
+    (err, decoded) => {
+      if (err) return res.status(403).json({ message: 'Forbidden' })
+      req.user = decoded.user.id
+      next()  
+    }
+  )
 }
 
 module.exports = verifyJWT

@@ -7,6 +7,7 @@ const multer = require('multer')
 const path = require('path')
 const mongoose = require('mongoose')
 const connectDB = require('./config/dbConn')
+const errorHandler = require('./middleware/errorHandler')
 const PORT = process.env.PORT || 3500
 
 connectDB()
@@ -42,6 +43,19 @@ app.post('/upload', upload.single('product'), (req, res) => {
       image_url: `http://localhost:${PORT}/images/${req.file.filename}`
     })
 })
+
+app.all(/.*/, (req, res) => {
+    res.status(404)
+    if(req.accepts('html')) {
+      res.sendFile(path.join(__dirname, 'views', '404.html'))
+    }else if(req.accepts('json')) {
+      res.json({ message: '404 Not Found' })
+    }else {
+      res.type('txt').send('404 Not Found')
+    }
+})
+
+app.use(errorHandler)
 
 mongoose.connection.once('open', () => {
   console.log('Connected to MongoDB');
